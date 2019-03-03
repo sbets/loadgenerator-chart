@@ -1,0 +1,17 @@
+## Images
+image:
+  registry: gcr.io
+  repository: google-samples/microservices-demo/loadgenerator
+  tag: v0.1.0
+
+global:
+  imageRegistry: gcr.io
+  name: loadgenerator
+
+resources:
+  requests:
+    cpu: 300m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
