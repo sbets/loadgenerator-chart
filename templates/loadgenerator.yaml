@@ -1,0 +1,34 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.name }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.global.name }}
+    spec:
+      terminationGracePeriodSeconds: 5
+      restartPolicy: Always
+      initContainers:
+      - name: wait-frontend
+        image: alpine:3.6
+        command: ['sh', '-c', 'set -x;  apk add --no-cache curl && 
+          until timeout -t 2 curl -f "http://${FRONTEND_ADDR}"; do 
+            echo "waiting for http://${FRONTEND_ADDR}"; 
+            sleep 2;
+          done;']
+        env:
+        - name: FRONTEND_ADDR
+          value: "frontend:80"
+      containers:
+      - name: main
+        image: {{ template "loadgenerator.image" . }}
+        env:
+        - name: FRONTEND_ADDR
+          value: "frontend:80"
+        - name: USERS
+          value: "10"
+        resources:
+{{ toYaml .Values.resources | indent 10 }}
